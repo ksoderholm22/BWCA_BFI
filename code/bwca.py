@@ -53,10 +53,10 @@ if selected=="About":
     st.write('**(2)**     List of lakes within county selection, sorted by BFI (high to low), with tab options for different species, and a download to CSV button')
     st.write('**(3)**     3-D scatter plot that shows lakes with non missing BFI values for Walleye, Northern Pike, and Smallmouth Bass, hover data contains lake name and BFI values')
 if selected=="Lake Search":
-    lm = pd.read_csv('/Users/kevinsoderholm/Desktop/PythonProjects/BWCA_APPATHON/CountyLakeMapping.csv',dtype=str)
+    lm = pd.read_csv('CountyLakeMapping.csv',dtype=str)
     lm.rename(columns={'Name': 'lake'}, inplace=True)
-    lakeagg=pd.read_csv('/Users/kevinsoderholm/Desktop/PythonProjects/BWCA_APPATHON/lakeagg.csv')
-    camps=pd.read_csv('/Users/kevinsoderholm/Desktop/PythonProjects/BWCA_APPATHON/campsites.csv')
+    lakeagg=pd.read_csv('lakeagg.csv')
+    camps=pd.read_csv('campsites.csv')
     camps.rename(columns={'Y': 'lat', 'X': 'lon', 'name': 'info'}, inplace=True)
     camps['Legend']='Campsite'
     camps[['test1','lake','test3','test4','test5','test6','test7','test8']] = camps['desc'].str.split('-', expand = True)
@@ -64,8 +64,8 @@ if selected=="Lake Search":
     camps['lake']=camps['lake'].str.strip()
     camps_lo=camps[['lake']].drop_duplicates()
     lm_reduce = pd.merge(lm,camps_lo, on='lake')  
-    ports1=pd.read_csv('/Users/kevinsoderholm/Desktop/PythonProjects/BWCA_APPATHON/portage_points.csv')
-    ports2=pd.read_csv('/Users/kevinsoderholm/Desktop/PythonProjects/BWCA_APPATHON/portage_tracks.csv')
+    ports1=pd.read_csv('portage_points.csv')
+    ports2=pd.read_csv('portage_tracks.csv')
     ports1.rename(columns={'Y': 'lat', 'X': 'lon'}, inplace=True)
     ports2.rename(columns={'Y': 'lat', 'X': 'lon'}, inplace=True)
     ports2[['b1','b2','b3','Rods','RodsVal','b6','b7']]=ports2['desc'].str.split(expand = True)
@@ -81,7 +81,7 @@ if selected=="Lake Search":
 
     if lake_select:
         st.header(lake_select)
-        fss=pd.read_csv('/Users/kevinsoderholm/Desktop/PythonProjects/BWCA_APPATHON/FishSurveySum.csv')
+        fss=pd.read_csv('FishSurveySum.csv')
         #get ID for Lake Name
         lakeid=lm_reduce[lm_reduce['lake']==lake_select].reset_index()
         numlakes=0
@@ -333,16 +333,16 @@ if selected=="BFI":
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
         return df.to_csv().encode('utf-8')
     #read in data
-    lm = pd.read_csv('/Users/kevinsoderholm/Desktop/PythonProjects/BWCA_APPATHON/CountyLakeMapping.csv',dtype=str)
+    lm = pd.read_csv('CountyLakeMapping.csv',dtype=str)
     lm.rename(columns={'Name': 'lake'}, inplace=True)
-    camps=pd.read_csv('/Users/kevinsoderholm/Desktop/PythonProjects/BWCA_APPATHON/campsites.csv')
+    camps=pd.read_csv('campsites.csv')
     camps.rename(columns={'Y': 'lat', 'X': 'lon', 'name': 'info'}, inplace=True)
     camps['Legend']='Campsite'
     camps[['test1','lake','test3','test4','test5','test6','test7','test8']] = camps['desc'].str.split('-', expand = True)
     camps['lake']=camps['lake'].str.replace('Lake','')
     camps['lake']=camps['lake'].str.strip()
     camps_lo=camps[['lake']].drop_duplicates()
-    lakeagg=pd.read_csv('/Users/kevinsoderholm/Desktop/PythonProjects/BWCA_APPATHON/lakeagg.csv')
+    lakeagg=pd.read_csv('lakeagg.csv')
     lakeagg['LakeID']=lakeagg['LakeID'].astype(str)
     #only keep lakes with campsites to align with other page
     lm_reduce = pd.merge(lm,camps_lo, on='lake')  
