@@ -311,21 +311,21 @@ if selected=="Lake Search":
     
         #Youtube Section
         st.header('YouTube Videos for this Lake')
-       # api_key='AIzaSyBk20ZEJpaHb-_qaD6z43JNP2GckViiZgk'
-       # youtube = build('youtube','v3',developerKey = api_key)
-       # search=lake_select+' lake BWCA'
-       # request = youtube.search().list(q=search,part='snippet',type='video')
-       # res = request.execute()
-       # list=[]
-       # for item in res['items']:
-       #     list.append(item['id']['videoId'])
+        api_key='AIzaSyBk20ZEJpaHb-_qaD6z43JNP2GckViiZgk'
+        youtube = build('youtube','v3',developerKey = api_key)
+        search=lake_select+' lake BWCA'
+        request = youtube.search().list(q=search,part='snippet',type='video')
+        res = request.execute()
+        list=[]
+        for item in res['items']:
+            list.append(item['id']['videoId'])
         #search
-       # yt_url1='https://www.youtube.com/watch?v='+list[0]
-       # yt_url2='https://www.youtube.com/watch?v='+list[1]
-       # yt_url3='https://www.youtube.com/watch?v='+list[2]
-       # st.video(yt_url1)
-       # st.video(yt_url2)
-       # st.video(yt_url3)
+        yt_url1='https://www.youtube.com/watch?v='+list[0]
+        yt_url2='https://www.youtube.com/watch?v='+list[1]
+        yt_url3='https://www.youtube.com/watch?v='+list[2]
+        st.video(yt_url1)
+        st.video(yt_url2)
+        st.video(yt_url3)
 
 if selected=="BFI":
     @st.cache_data
