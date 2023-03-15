@@ -1,0 +1,7 @@
+flatten_json==0.1.13
+google_api_python_client==2.81.0
+markdownify==0.11.6
+pandas==1.5.3
+plotly==5.13.1
+streamlit==1.19.0
+streamlit_option_menu==0.3.2
