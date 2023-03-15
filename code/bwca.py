@@ -28,7 +28,7 @@ if selected=="About":
     st.write('Established in 1964 as Federally Designated Wilderness, the Boundary Waters Canoe Area Wilderness is over one million acres of rugged and remote boreal forest in the northern third of the Superior National Forest in northeastern Minnesota.')
     st.write("The BWCAW extends nearly 150 miles along the International Boundary, adjacent to Canada's Quetico and La Verendrye Provincial Parks, is bordered on the west by Voyageurs National Park, and by Grand Portage National Monument to the east. The BWCAW contains over 1,200 miles of canoe routes, 12 hiking trails and over 2,000 designated campsites. The BWCAW is composed of lakes, islands, rocky outcrops and forest.")
     st.write("_U.S. Forest Service_ [Learn More](https://www.fs.usda.gov/recarea/superior/recarea/?recid=84168)")
-    st.image('/vidimage/bwcamap.png',caption='Credit: Canoeing.com LTD')
+    st.image('vidimage/bwcamap.png',caption='Credit: Canoeing.com LTD')
     st.header('About this Tool')
     st.subheader('Purpose')
     st.write('This application is designed for BWCA trip planning as a personal use tool.  The app brings together various BWCA data sources into one location, and creates new metrics and data visualizations from these data sources.')
@@ -36,11 +36,11 @@ if selected=="About":
     
     with st.container():
         col1,col2=st.columns(2)
-        col1.image('/vidimage/bwca-logo.png')
+        col1.image('vidimage/bwca-logo.png')
         col2.write('Campsite and portage waypoints are from publicly available GPX files by BWCA.com and are for personal use only (not to be used commercially or redistributed).')
     with st.container():
         col1,col2=st.columns(2)
-        col1.image('/vidimage/mndnr.jpeg')
+        col1.image('vidimage/mndnr.jpeg')
         col2.write('Lake data including Fisheries Surveys are from publicly available JSON strings from URL of the LakeFinder tool from the Minnesota Department of Natural Resources.')
     st.header('Functionality')
     st.subheader('Lake Search')
