@@ -427,9 +427,6 @@ if selected=="Gallery":
     col1.image('vidimage/47.JPG')
     col1.image('vidimage/49.JPG')
     col1.image('vidimage/52.JPG')
-    col1.image('vidimage/53.JPG')
-    col1.image('vidimage/54.JPG')
-    col1.image('vidimage/55.JPG')
     col1.image('vidimage/56.JPG')
     col1.image('vidimage/57.JPG')
     col2.image('vidimage/2.JPG')
@@ -457,6 +454,10 @@ if selected=="Gallery":
     col2.image('vidimage/46.JPG')
     col2.image('vidimage/48.JPG')
     col2.image('vidimage/50.JPG')
+    col2.image('vidimage/53.JPG')
+    col2.image('vidimage/54.JPG')
+    col2.image('vidimage/55.JPG')
+
  
 
 
