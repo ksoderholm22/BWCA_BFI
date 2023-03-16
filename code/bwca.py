@@ -400,7 +400,6 @@ if selected=="BFI":
 
 if selected=="Gallery":
     col1,col2=st.columns(2)
-    col1.image('vidimage/51.JPG')
     col1.image('vidimage/1.JPG')
     col1.image('vidimage/3.JPG')
     col1.image('vidimage/5.JPG')
@@ -457,6 +456,7 @@ if selected=="Gallery":
     col2.image('vidimage/53.JPG')
     col2.image('vidimage/54.JPG')
     col2.image('vidimage/55.JPG')
+    col2.image('vidimage/51.JPG')
 
  
 
