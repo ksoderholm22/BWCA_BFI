@@ -338,7 +338,7 @@ if selected=="Lake Search":
                 fig.add_bar(x=fss['Length'], y=fg['WAEpct'], marker_color='red',name=lake_select)
                 fig.update_xaxes(range=[0, 32])
                 tab2.plotly_chart(fig, use_container_width=True)
-                col1,col2,col3,col4,col5=tab1.columns(5)
+                col1,col2,col3,col4,col5=tab2.columns(5)
                 col2.metric('**Walleye BFI**',BFI_WAE)
                 col4.metric('**Walleye BFI Percentile**',BFI_WAE_PCT)
             with tab3:
@@ -346,7 +346,7 @@ if selected=="Lake Search":
                 fig.add_bar(x=fss['Length'], y=fg['NOPpct'],marker_color='red', name=lake_select)
                 fig.update_xaxes(range=[0, 46])
                 tab3.plotly_chart(fig, use_container_width=True)
-                col1,col2,col3,col4,col5=tab2.columns(5)
+                col1,col2,col3,col4,col5=tab3.columns(5)
                 col2.metric('**Northern Pike BFI**',BFI_NOP)
                 col4.metric('**Northern Pike BFI Percentile**',BFI_NOP_PCT)
             with tab4:
@@ -354,7 +354,7 @@ if selected=="Lake Search":
                 fig.add_bar(x=fss['Length'], y=fg['LATpct'],marker_color='red', name=lake_select)
                 fig.update_xaxes(range=[0, 42])
                 tab4.plotly_chart(fig, use_container_width=True)
-                col1,col2,col3,col4,col5=tab3.columns(5)
+                col1,col2,col3,col4,col5=tab4.columns(5)
                 col2.metric('**Lake Trout BFI**',BFI_LAT)
                 col4.metric('**Lake Trout BFI Percentile**',BFI_LAT_PCT)
             with tab5:
@@ -362,7 +362,7 @@ if selected=="Lake Search":
                 fig.add_bar(x=fss['Length'], y=fg['SMBpct'],marker_color='red', name=lake_select)
                 fig.update_xaxes(range=[0, 22])
                 tab5.plotly_chart(fig, use_container_width=True)
-                col1,col2,col3,col4,col5=tab4.columns(5)
+                col1,col2,col3,col4,col5=tab5.columns(5)
                 col2.metric('**Smallmouth Bass BFI**',BFI_SMB)
                 col4.metric('**Smallmouth Bass BFI Percentile**',BFI_SMB_PCT)
             
