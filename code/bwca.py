@@ -104,6 +104,8 @@ if selected=="About":
         st.write('**(2)**     Interactive map auto centered to lake selection, topographic and satellite layers, markers/colors for campsites and portages, hover data shows campsite number and portage distance)')
         st.write('**(3)**     Fishery Lake Survey data shown which includes: Lake Characteristics, Fish Size Distribution, and Status of the Fishery')
         st.write('**(4)**     Top three search results from YouTube for the prompt "<selected lake> BWCA"')
+    with st.expander('Lake Stats'):
+        st.write('**(1)**     Not sure yet')
     with st.expander('Big Fish Index'):
         st.write('**(1)**     Optional filter on County within BWCA')
         st.write('**(2)**     List of lakes within county selection, sorted by BFI (high to low), with tab options for different species, and a download to CSV button')
@@ -273,6 +275,10 @@ if selected=="Lake Search":
         lakeaggshort['BFI_LAT'] = lakeaggshort['BFI_LAT'].map('{:,.2f}'.format)
         lakeaggshort['BFI_SMB'] = lakeaggshort['BFI_SMB'].map('{:,.2f}'.format)
         lakeaggshort['BFI_WAE'] = lakeaggshort['BFI_WAE'].map('{:,.2f}'.format)
+        lakeaggshort['BFI_NOP_Pct_Raw'] = lakeaggshort['BFI_NOP_Pct']
+        lakeaggshort['BFI_LAT_Pct_Raw'] = lakeaggshort['BFI_LAT_Pct']
+        lakeaggshort['BFI_SMB_Pct_Raw'] = lakeaggshort['BFI_SMB_Pct']
+        lakeaggshort['BFI_WAE_Pct_Raw'] = lakeaggshort['BFI_WAE_Pct']
         lakeaggshort['BFI_NOP_Pct'] = lakeaggshort['BFI_NOP_Pct'].apply(lambda x: x*100).map('{:,.2f}%'.format)
         lakeaggshort['BFI_LAT_Pct'] = lakeaggshort['BFI_LAT_Pct'].apply(lambda x: x*100).map('{:,.2f}%'.format)
         lakeaggshort['BFI_SMB_Pct'] = lakeaggshort['BFI_SMB_Pct'].apply(lambda x: x*100).map('{:,.2f}%'.format)
@@ -281,15 +287,19 @@ if selected=="Lake Search":
         if not lakeaggshort.empty:
             BFI_NOP=lakeaggshort.loc[0]['BFI_NOP']
             BFI_NOP_PCT=lakeaggshort.loc[0]['BFI_NOP_Pct']
+            BFI_NOP_PCT_RAW=lakeaggshort.loc[0]['BFI_NOP_Pct_Raw']
             BFI_LAT=lakeaggshort.loc[0]['BFI_LAT']
             BFI_LAT_PCT=lakeaggshort.loc[0]['BFI_LAT_Pct']
+            BFI_LAT_PCT_RAW=lakeaggshort.loc[0]['BFI_LAT_Pct_Raw']
             BFI_SMB=lakeaggshort.loc[0]['BFI_SMB']
             BFI_SMB_PCT=lakeaggshort.loc[0]['BFI_SMB_Pct']
+            BFI_SMB_PCT_RAW=lakeaggshort.loc[0]['BFI_SMB_Pct_Raw']
             BFI_WAE=lakeaggshort.loc[0]['BFI_WAE']
             BFI_WAE_PCT=lakeaggshort.loc[0]['BFI_WAE_Pct']
+            BFI_WAE_PCT_RAW=lakeaggshort.loc[0]['BFI_WAE_Pct_Raw']
     
 
-            tab1,tab2,tab3,tab4=st.tabs(['Walleye','Northern Pike','Lake Trout','Smallmouth Bass'])
+            tab1,tab2,tab3,tab4,tab5=st.tabs(['Walleye','Northern Pike','Lake Trout','Smallmouth Bass','Radar'])
             with tab1:
                 fig = px.line(x=fss['Length'], y=fss['WAEpct'], color=px.Constant('All BWCA'),labels=dict(x='Length', y='Pct', color='Legend'))
                 fig.add_bar(x=fss['Length'], y=fg['WAEpct'], marker_color='red',name=lake_select)
@@ -322,6 +332,39 @@ if selected=="Lake Search":
                 col1,col2,col3,col4,col5=tab4.columns(5)
                 col2.metric('**Smallmouth Bass BFI**',BFI_SMB)
                 col4.metric('**Smallmouth Bass BFI Percentile**',BFI_SMB_PCT)
+            with tab5:
+                def cat(col,BFI_PCT):
+                    if BFI_PCT<=0.2:
+                        col.progress(BFI_PCT, text=None)
+                        col.write(':red[**REALLY BAD**]')
+                    if 0.2<BFI_PCT<=0.4:
+                        col.progress(BFI_PCT, text=None)
+                        col.write(':red[**BAD**]')
+                    if 0.4<BFI_PCT<=0.6:
+                        col.progress(BFI_PCT, text=None)
+                        col.write(':blue[**OK**]')
+                    if 0.6<BFI_PCT<=0.8:
+                        col.progress(BFI_PCT, text=None)
+                        col.write(':green[**GOOD**]')
+                    if 0.8<BFI_PCT<=0.95:
+                        col.progress(BFI_PCT, text=None)
+                        col.write(':green[**REALLY GOOD**]')
+                    if 0.95<BFI_PCT<=1:
+                        col.progress(BFI_PCT, text=None)
+                        col.write(':green[**PHENOMENAL**]')
+                df = pd.DataFrame(dict(r=[BFI_WAE,BFI_NOP,BFI_LAT,BFI_SMB],theta=['WALLEYE BFI','NORTHERN PIKE BFI','LAKE TROUT BFI','SMALLMOUTH BASS BFI']))
+                fig = px.line_polar(df, r='r', theta='theta', line_close=True)
+                fig.update_traces(fill='toself')
+                tab5.plotly_chart(fig,use_container_width=True)
+                col1,col2,col3,col4=st.columns(4)
+                col1.metric('**Walleye BFI**',BFI_WAE)
+                cat(col1,float(BFI_WAE_PCT_RAW))
+                col2.metric('**Northern Pike BFI**',BFI_NOP)
+                cat(col2,float(BFI_NOP_PCT_RAW))
+                col3.metric('**Lake Trout BFI**',BFI_LAT)
+                cat(col3,float(BFI_LAT_PCT_RAW))
+                col4.metric('**Smallmouth Bass BFI**',BFI_SMB)
+                cat(col4,float(BFI_SMB_PCT_RAW))
         else:
             st.write("No Fishery Survey Data for Walleye, Northern Pike, Smallmouth, or Lake Trout")
         st.write('**Survey Date:**    '+SurveyDate)
@@ -469,5 +512,4 @@ if selected=="Gallery":
         col1.image('vidimage/LT2.JPG')
         col2.image('vidimage/LT3.JPG')
         col2.image('vidimage/LT4.JPG')
-
 
