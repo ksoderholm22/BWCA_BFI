@@ -19,43 +19,32 @@ st.set_page_config(
 
 #Create Menu
 with st.sidebar:
-    selected = option_menu("BWCA Lake Search", ["About", 'Lake Search','BFI','Gallery'], 
+    selected = option_menu("BWCA Lake Search", ["About", 'Lake Search','Big Fish Index','Gallery'], 
         icons=['info-circle','search','calculator','camera'],menu_icon="tree-fill", default_index=0)
   
 #read data
-if selected=="About":
-    st.header('About the BWCA')
-    st.write('Established in 1964 as Federally Designated Wilderness, the Boundary Waters Canoe Area Wilderness is over one million acres of rugged and remote boreal forest in the northern third of the Superior National Forest in northeastern Minnesota.')
-    st.write("The BWCAW extends nearly 150 miles along the International Boundary, adjacent to Canada's Quetico and La Verendrye Provincial Parks, is bordered on the west by Voyageurs National Park, and by Grand Portage National Monument to the east. The BWCAW contains over 1,200 miles of canoe routes, 12 hiking trails and over 2,000 designated campsites. The BWCAW is composed of lakes, islands, rocky outcrops and forest.")
-    st.write("_U.S. Forest Service_ [Learn More](https://www.fs.usda.gov/recarea/superior/recarea/?recid=84168)")
-    st.image('vidimage/bwcamap.png',caption='Credit: Canoeing.com LTD')
-    st.header('About this Tool')
-    st.subheader('Purpose')
-    st.write('This application is designed for BWCA trip planning as a personal use tool.  The app brings together various BWCA data sources into one location, and creates new metrics and data visualizations from these data sources.')
-    st.subheader('Data')
-    
-    with st.container():
-        col1,col2=st.columns(2)
-        col1.image('vidimage/bwca-logo.png')
-        col2.write('Campsite and portage waypoints are from publicly available GPX files by BWCA.com and are for personal use only (not to be used commercially or redistributed).')
-    with st.container():
-        col1,col2=st.columns(2)
-        col1.image('vidimage/mndnr.jpeg')
-        col2.write('Lake data including Fisheries Surveys are from publicly available JSON strings from URL of the LakeFinder tool from the Minnesota Department of Natural Resources.')
-    st.header('Functionality')
-    st.subheader('Lake Search')
-    st.write('**(1)**     Enter a Lake Name')
-    st.write('**(2)**     Interactive map auto centered to lake selection, topographic and satellite layers, markers/colors for campsites and portages, hover data shows campsite number and portage distance)')
-    st.write('**(3)**     Fishery Lake Survey data shown which includes: Lake Characteristics, Fish Size Distribution, and Status of the Fishery')
-    st.write('**(4)**     Top three search results from YouTube for the prompt "<selected lake> BWCA"')
-    st.subheader('BFI')
-    st.write('**(1)**     Optional filter on County within BWCA')
-    st.write('**(2)**     List of lakes within county selection, sorted by BFI (high to low), with tab options for different species, and a download to CSV button')
-    st.write('**(3)**     3-D scatter plot that shows lakes with non missing BFI values for Walleye, Northern Pike, and Smallmouth Bass, hover data contains lake name and BFI values')
-if selected=="Lake Search":
+@st.cache_data
+def pull_fss():
+    fss=pd.read_csv('FishSurveySum.csv')
+    return fss
+fss=pull_fss()
+
+@st.cache_data
+def pull_clean_lm():
     lm = pd.read_csv('CountyLakeMapping.csv',dtype=str)
     lm.rename(columns={'Name': 'lake'}, inplace=True)
+    return lm
+lm=pull_clean_lm()
+ 
+@st.cache_data
+def pull_clean_lakeagg():
     lakeagg=pd.read_csv('lakeagg.csv')
+    lakeagg['LakeID']=lakeagg['LakeID'].astype(str)
+    return lakeagg
+lakeagg=pull_clean_lakeagg()
+
+@st.cache_data
+def pull_clean_camps():
     camps=pd.read_csv('campsites.csv')
     camps.rename(columns={'Y': 'lat', 'X': 'lon', 'name': 'info'}, inplace=True)
     camps['Legend']='Campsite'
@@ -63,7 +52,12 @@ if selected=="Lake Search":
     camps['lake']=camps['lake'].str.replace('Lake','')
     camps['lake']=camps['lake'].str.strip()
     camps_lo=camps[['lake']].drop_duplicates()
-    lm_reduce = pd.merge(lm,camps_lo, on='lake')  
+    return camps, camps_lo
+camps,camps_lo=pull_clean_camps()
+
+    
+@st.cache_data
+def pull_clean_ports():
     ports1=pd.read_csv('portage_points.csv')
     ports2=pd.read_csv('portage_tracks.csv')
     ports1.rename(columns={'Y': 'lat', 'X': 'lon'}, inplace=True)
@@ -74,15 +68,55 @@ if selected=="Lake Search":
     ports1=pd.merge(ports1,ports2[['lat','lon','info']], on=['lat','lon'], how='left')
     ports3=pd.concat([ports1, ports2], ignore_index=True, sort=False)
     ports3['Legend']='Portage'
-    camps_ports=pd.concat([camps, ports3], ignore_index=True, sort=False)
+    return ports3
+ports3=pull_clean_ports()
 
+@st.cache_data
+def merge():
+    lm_reduce = pd.merge(lm,camps_lo, on='lake') 
+    camps_ports=pd.concat([camps, ports3], ignore_index=True, sort=False)
+    return lm_reduce, camps_ports
+lm_reduce,camps_ports=merge()
+
+if selected=="About":
+    st.header('About the BWCA')
+    st.write('Established in 1964 as Federally Designated Wilderness, the Boundary Waters Canoe Area Wilderness is over one million acres of rugged and remote boreal forest in the northern third of the Superior National Forest in northeastern Minnesota.')
+    st.write("The BWCAW extends nearly 150 miles along the International Boundary, adjacent to Canada's Quetico and La Verendrye Provincial Parks, is bordered on the west by Voyageurs National Park, and by Grand Portage National Monument to the east. The BWCAW contains over 1,200 miles of canoe routes, 12 hiking trails and over 2,000 designated campsites. The BWCAW is composed of lakes, islands, rocky outcrops and forest.")
+    st.write("_U.S. Forest Service_ [Learn More](https://www.fs.usda.gov/recarea/superior/recarea/?recid=84168)")
+    st.image('vidimage/bwcamap.png',caption='Credit: Canoeing.com LTD')
+
+    st.header('About this Tool')
+    st.subheader('Purpose')
+    st.write('This application is designed for BWCA trip planning as a personal use tool.  The app brings together various BWCA data sources into one location, and creates new metrics and data visualizations from these data sources.')
+    st.subheader('Data')
+    with st.container():
+        col1,col2=st.columns(2)
+        col1.image('vidimage/bwca-logo.png')
+        col2.write('Campsite and portage waypoints are from publicly available GPX files by BWCA.com and are for personal use only (not to be used commercially or redistributed).')
+    with st.container():
+        col1,col2=st.columns(2)
+        col1.image('vidimage/mndnr.jpeg')
+        col2.write('Lake data including Fisheries Surveys are from publicly available JSON strings from URL of the LakeFinder tool from the Minnesota Department of Natural Resources.')
+    
+    st.header('Functionality')
+    with st.expander('Lake Search'):
+        st.write('**(1)**     Enter a Lake Name')
+        st.write('**(2)**     Interactive map auto centered to lake selection, topographic and satellite layers, markers/colors for campsites and portages, hover data shows campsite number and portage distance)')
+        st.write('**(3)**     Fishery Lake Survey data shown which includes: Lake Characteristics, Fish Size Distribution, and Status of the Fishery')
+        st.write('**(4)**     Top three search results from YouTube for the prompt "<selected lake> BWCA"')
+    with st.expander('Lake Stats'):
+        st.write('**(1)**     Not sure yet')
+    with st.expander('Big Fish Index'):
+        st.write('**(1)**     Optional filter on County within BWCA')
+        st.write('**(2)**     List of lakes within county selection, sorted by BFI (high to low), with tab options for different species, and a download to CSV button')
+        st.write('**(3)**     3-D scatter plot that shows lakes with non missing BFI values for Walleye, Northern Pike, and Smallmouth Bass, hover data contains lake name and BFI values')
+
+if selected=="Lake Search":
+ 
     st.header('Search for a Lake')
     lake_select = st.selectbox('Select Lake',list(lm_reduce['lake'].unique()),index=127)
-
     if lake_select:
         st.header(lake_select)
-        fss=pd.read_csv('FishSurveySum.csv')
-        #get ID for Lake Name
         lakeid=lm_reduce[lm_reduce['lake']==lake_select].reset_index()
         numlakes=0
         if len(lakeid.index)>1:
@@ -91,19 +125,8 @@ if selected=="Lake Search":
             town_select=st.selectbox('Select Town',list(lakeid['Nearest Town'].unique()),index=0)
             lakeid=lakeid[lakeid['Nearest Town']==town_select].reset_index()
         lakeidval=lakeid.loc[0]['ID']
-
-        #subset lakeagg  on selected lake
-        lakeagg['LakeID']=lakeagg['LakeID'].astype(str)
         lakeaggshort=lakeagg[lakeagg['LakeID']==lakeidval].reset_index()
-
-        #subset campsites on selected lake - this is to help center and zoom the map for display
         camps_small=camps[camps['lake']==lake_select]
-        #if lakeid['County']=='St. Louis':
-        #     camps_small2=(camps['lon']>=-93.00)&(camps['lon']<=-91.75)
-        #if lakeid['County']=='Lake':
-        #    camps_small2=(camps['lon']>=-91.80)&(camps['lon']<=-91.02)
-        #if lakeid['County']=='Cook':
-        #    camps_small2=(camps['lon']>=-91.07)&(camps['lon']<=-89.46)
         numsites=str(camps_small.shape[0])
         latcenter=camps_small['lat'].mean()
         loncenter=camps_small['lon'].mean()
@@ -326,27 +349,19 @@ if selected=="Lake Search":
         st.video(yt_url1)
         st.video(yt_url2)
         st.video(yt_url3)
-
-if selected=="BFI":
+if selected=="Big Fish Index":
     @st.cache_data
     def convert_df(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
         return df.to_csv().encode('utf-8')
-    #read in data
-    lm = pd.read_csv('CountyLakeMapping.csv',dtype=str)
-    lm.rename(columns={'Name': 'lake'}, inplace=True)
-    camps=pd.read_csv('campsites.csv')
-    camps.rename(columns={'Y': 'lat', 'X': 'lon', 'name': 'info'}, inplace=True)
-    camps['Legend']='Campsite'
-    camps[['test1','lake','test3','test4','test5','test6','test7','test8']] = camps['desc'].str.split('-', expand = True)
-    camps['lake']=camps['lake'].str.replace('Lake','')
-    camps['lake']=camps['lake'].str.strip()
-    camps_lo=camps[['lake']].drop_duplicates()
-    lakeagg=pd.read_csv('lakeagg.csv')
-    lakeagg['LakeID']=lakeagg['LakeID'].astype(str)
-    #only keep lakes with campsites to align with other page
-    lm_reduce = pd.merge(lm,camps_lo, on='lake')  
-    #county filter
+
+    st.header('Big Fish Index (BFI)')
+    with st.expander('What is it?'):
+        st.write('BFI is a lake and species level ranking metric that compares the fish size distribution of a selected lake, to the fish size distribution of all BWCA lakes with Fish Survey Data.')
+    with st.expander('How is it calculated?'):
+        st.write('BFI is calculated as a ratio of the average length of a fish species between a sample (selected lake) and population (all BWCA lakes). This ratio is then scaled into an index from 1-100 based on the minimum and maximum values from all BWCA lakes.  Higher values indicate a larger fish size distribution.')
+    
+    #county filter.  
     st.header('Filter by County')
     county_select=st.selectbox('Select County',['All']+list(lm_reduce['County'].unique()))
     #join lakeagg
@@ -389,7 +404,7 @@ if selected=="BFI":
     with tab4:
         t4cols=['lake','ID','Nearest Town','County','BFI_SMB','BFI_SMB_Pct']
         t4=merged_reduced.sort_values(by=['BFI_SMB'],ascending=False)
-        tab4.table(t4)
+        tab4.table(t4[t4cols].head(20))
         csv = convert_df(t4[t4cols].head(50))
         st.download_button(label="Download data as CSV",data=csv,file_name='SMB_BFI.csv',mime='text/csv',)
         
@@ -399,65 +414,62 @@ if selected=="BFI":
     st.plotly_chart(fig)
 
 if selected=="Gallery":
-    col1,col2=st.columns(2)
-    col1.image('vidimage/1.JPG')
-    col1.image('vidimage/3.JPG')
-    col1.image('vidimage/5.JPG')
-    col1.image('vidimage/7.JPG')
-    col1.image('vidimage/9.JPG')
-    col1.image('vidimage/11.JPG')
-    col1.image('vidimage/13.JPG')
-    col1.image('vidimage/15.JPG')
-    col1.image('vidimage/17.JPG')
-    col1.image('vidimage/19.JPG')
-    col1.image('vidimage/21.JPG')
-    col1.image('vidimage/23.JPG')
-    col1.image('vidimage/25.JPG')
-    col1.image('vidimage/27.JPG')
-    col1.image('vidimage/29.JPG')
-    col1.image('vidimage/31.JPG')
-    col1.image('vidimage/33.JPG')
-    col1.image('vidimage/35.JPG')
-    col1.image('vidimage/37.JPG')
-    col1.image('vidimage/39.JPG')
-    col1.image('vidimage/41.JPG')
-    col1.image('vidimage/43.JPG')
-    col1.image('vidimage/45.JPG')
-    col1.image('vidimage/47.JPG')
-    col1.image('vidimage/49.JPG')
-    col1.image('vidimage/52.JPG')
-    col1.image('vidimage/56.JPG')
-    col1.image('vidimage/57.JPG')
-    col2.image('vidimage/2.JPG')
-    col2.image('vidimage/4.JPG')
-    col2.image('vidimage/6.JPG')
-    col2.image('vidimage/8.JPG')
-    col2.image('vidimage/10.JPG')
-    col2.image('vidimage/12.JPG')
-    col2.image('vidimage/14.JPG')
-    col2.image('vidimage/16.JPG')
-    col2.image('vidimage/18.JPG')
-    col2.image('vidimage/20.JPG')
-    col2.image('vidimage/22.JPG')
-    col2.image('vidimage/24.JPG')
-    col2.image('vidimage/26.JPG')
-    col2.image('vidimage/28.JPG')
-    col2.image('vidimage/30.JPG')
-    col2.image('vidimage/32.JPG')
-    col2.image('vidimage/34.JPG')
-    col2.image('vidimage/36.JPG')
-    col2.image('vidimage/38.JPG')
-    col2.image('vidimage/40.JPG')
-    col2.image('vidimage/42.JPG')
-    col2.image('vidimage/44.JPG')
-    col2.image('vidimage/46.JPG')
-    col2.image('vidimage/48.JPG')
-    col2.image('vidimage/50.JPG')
-    col2.image('vidimage/53.JPG')
-    col2.image('vidimage/54.JPG')
-    col2.image('vidimage/55.JPG')
-    col2.image('vidimage/51.JPG')
-
- 
+    tab1,tab2,tab3,tab4=st.tabs(['Smallmouth','Walleye','Northern Pike','Lake Trout'])
+    with tab1:
+        col1,col2=st.columns(2)
+        col1.image('vidimage/B1.JPG')
+        col1.image('vidimage/B2.JPG')
+        col1.image('vidimage/B3.JPG')
+        col1.image('vidimage/B4.JPG')
+        col1.image('vidimage/B5.JPG')
+        col1.image('vidimage/B6.JPG')
+        col1.image('vidimage/B7.JPG')
+        col1.image('vidimage/B8.JPG')
+        col1.image('vidimage/B9.JPG')
+        col1.image('vidimage/B10.JPG')
+        col1.image('vidimage/B11.JPG')
+        col1.image('vidimage/B12.JPG')
+        col2.image('vidimage/B13.JPG')
+        col2.image('vidimage/B14.JPG')
+        col2.image('vidimage/B15.JPG')
+        col2.image('vidimage/B16.JPG')
+        col2.image('vidimage/B17.JPG')
+        col2.image('vidimage/B18.JPG')
+        col2.image('vidimage/B19.JPG')
+        col2.image('vidimage/B20.JPG')
+        col2.image('vidimage/B21.JPG')
+        col2.image('vidimage/B22.JPG')
+        col2.image('vidimage/B23.JPG')
+    with tab2:
+        col1,col2=st.columns(2)
+        col1.image('vidimage/W1.JPG')
+        col1.image('vidimage/W2.JPG')
+        col1.image('vidimage/W3.JPG')
+        col1.image('vidimage/W4.JPG')
+        col1.image('vidimage/W5.JPG')
+        col1.image('vidimage/W6.JPG')
+        col1.image('vidimage/W7.JPG')
+        col2.image('vidimage/W8.JPG')
+        col2.image('vidimage/W9.JPG')
+        col2.image('vidimage/W10.JPG')
+        col2.image('vidimage/W11.JPG')
+        col2.image('vidimage/W12.JPG')
+        col2.image('vidimage/W13.JPG')
+        col2.image('vidimage/W14.JPG')
+    with tab3:
+        col1,col2=st.columns(2)
+        col1.image('vidimage/N1.JPG')
+        col1.image('vidimage/N2.JPG')
+        col1.image('vidimage/N3.JPG')
+        col2.image('vidimage/N4.JPG')
+        col2.image('vidimage/N5.JPG')
+        col2.image('vidimage/N6.JPG')
+        col2.image('vidimage/N7.JPG')
+    with tab4:
+        col1,col2=st.columns(2)
+        col1.image('vidimage/LT1.JPG')
+        col1.image('vidimage/LT2.JPG')
+        col2.image('vidimage/LT3.JPG')
+        col2.image('vidimage/LT4.JPG')
 
 
