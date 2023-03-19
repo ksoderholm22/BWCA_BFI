@@ -299,40 +299,8 @@ if selected=="Lake Search":
             BFI_WAE_PCT_RAW=lakeaggshort.loc[0]['BFI_WAE_Pct_Raw']
     
 
-            tab1,tab2,tab3,tab4,tab5=st.tabs(['Walleye','Northern Pike','Lake Trout','Smallmouth Bass','Radar'])
+            tab1,tab2,tab3,tab4,tab5=st.tabs(['Radar','Walleye','Northern Pike','Lake Trout','Smallmouth Bass'])
             with tab1:
-                fig = px.line(x=fss['Length'], y=fss['WAEpct'], color=px.Constant('All BWCA'),labels=dict(x='Length', y='Pct', color='Legend'))
-                fig.add_bar(x=fss['Length'], y=fg['WAEpct'], marker_color='red',name=lake_select)
-                fig.update_xaxes(range=[0, 32])
-                tab1.plotly_chart(fig, use_container_width=True)
-                col1,col2,col3,col4,col5=tab1.columns(5)
-                col2.metric('**Walleye BFI**',BFI_WAE)
-                col4.metric('**Walleye BFI Percentile**',BFI_WAE_PCT)
-            with tab2:
-                fig = px.line(x=fss['Length'], y=fss['NOPpct'], color=px.Constant('All BWCA'),labels=dict(x='Length', y='Pct', color='Legend'))
-                fig.add_bar(x=fss['Length'], y=fg['NOPpct'],marker_color='red', name=lake_select)
-                fig.update_xaxes(range=[0, 46])
-                tab2.plotly_chart(fig, use_container_width=True)
-                col1,col2,col3,col4,col5=tab2.columns(5)
-                col2.metric('**Northern Pike BFI**',BFI_NOP)
-                col4.metric('**Northern Pike BFI Percentile**',BFI_NOP_PCT)
-            with tab3:
-                fig = px.line(x=fss['Length'], y=fss['LATpct'], color=px.Constant('All BWCA'),labels=dict(x='Length', y='Pct', color='Legend'))
-                fig.add_bar(x=fss['Length'], y=fg['LATpct'],marker_color='red', name=lake_select)
-                fig.update_xaxes(range=[0, 42])
-                tab3.plotly_chart(fig, use_container_width=True)
-                col1,col2,col3,col4,col5=tab3.columns(5)
-                col2.metric('**Lake Trout BFI**',BFI_LAT)
-                col4.metric('**Lake Trout BFI Percentile**',BFI_LAT_PCT)
-            with tab4:
-                fig = px.line(x=fss['Length'], y=fss['SMBpct'], color=px.Constant('All BWCA'),labels=dict(x='Length', y='Pct', color='Legend'))
-                fig.add_bar(x=fss['Length'], y=fg['SMBpct'],marker_color='red', name=lake_select)
-                fig.update_xaxes(range=[0, 22])
-                tab4.plotly_chart(fig, use_container_width=True)
-                col1,col2,col3,col4,col5=tab4.columns(5)
-                col2.metric('**Smallmouth Bass BFI**',BFI_SMB)
-                col4.metric('**Smallmouth Bass BFI Percentile**',BFI_SMB_PCT)
-            with tab5:
                 def cat(col,BFI_PCT):
                     if BFI_PCT<=0.2:
                         col.progress(BFI_PCT, text=None)
@@ -352,7 +320,7 @@ if selected=="Lake Search":
                     if 0.95<BFI_PCT<=1:
                         col.progress(BFI_PCT, text=None)
                         col.write(':green[**PHENOMENAL**]')
-                df = pd.DataFrame(dict(r=[BFI_WAE_PCT_RAW,BFI_NOP_PCT_RAW,BFI_LAT_PCT_RAW,BFI_SMB_PCT_RAW],theta=['WALLEYE Percentile','NORTHERN PIKE Percentile','LAKE TROUT Percentile','SMALLMOUTH BASS Percentile']))
+                df = pd.DataFrame(dict(r=[BFI_WAE_PCT_RAW,BFI_NOP_PCT_RAW,BFI_LAT_PCT_RAW,BFI_SMB_PCT_RAW],theta=['WALLEYE','NORTHERN PIKE','LAKE TROUT','SMALLMOUTH BASS']))
                 fig = px.line_polar(df, r='r', theta='theta', line_close=True)
                 fig.update_traces(fill='toself')
                 tab5.plotly_chart(fig,use_container_width=True)
@@ -365,6 +333,39 @@ if selected=="Lake Search":
                 cat(col3,float(BFI_LAT_PCT_RAW))
                 col4.metric('**Smallmouth Bass Percentile**',BFI_SMB_PCT)
                 cat(col4,float(BFI_SMB_PCT_RAW))
+            with tab2:
+                fig = px.line(x=fss['Length'], y=fss['WAEpct'], color=px.Constant('All BWCA'),labels=dict(x='Length', y='Pct', color='Legend'))
+                fig.add_bar(x=fss['Length'], y=fg['WAEpct'], marker_color='red',name=lake_select)
+                fig.update_xaxes(range=[0, 32])
+                tab1.plotly_chart(fig, use_container_width=True)
+                col1,col2,col3,col4,col5=tab1.columns(5)
+                col2.metric('**Walleye BFI**',BFI_WAE)
+                col4.metric('**Walleye BFI Percentile**',BFI_WAE_PCT)
+            with tab3:
+                fig = px.line(x=fss['Length'], y=fss['NOPpct'], color=px.Constant('All BWCA'),labels=dict(x='Length', y='Pct', color='Legend'))
+                fig.add_bar(x=fss['Length'], y=fg['NOPpct'],marker_color='red', name=lake_select)
+                fig.update_xaxes(range=[0, 46])
+                tab2.plotly_chart(fig, use_container_width=True)
+                col1,col2,col3,col4,col5=tab2.columns(5)
+                col2.metric('**Northern Pike BFI**',BFI_NOP)
+                col4.metric('**Northern Pike BFI Percentile**',BFI_NOP_PCT)
+            with tab4:
+                fig = px.line(x=fss['Length'], y=fss['LATpct'], color=px.Constant('All BWCA'),labels=dict(x='Length', y='Pct', color='Legend'))
+                fig.add_bar(x=fss['Length'], y=fg['LATpct'],marker_color='red', name=lake_select)
+                fig.update_xaxes(range=[0, 42])
+                tab3.plotly_chart(fig, use_container_width=True)
+                col1,col2,col3,col4,col5=tab3.columns(5)
+                col2.metric('**Lake Trout BFI**',BFI_LAT)
+                col4.metric('**Lake Trout BFI Percentile**',BFI_LAT_PCT)
+            with tab5:
+                fig = px.line(x=fss['Length'], y=fss['SMBpct'], color=px.Constant('All BWCA'),labels=dict(x='Length', y='Pct', color='Legend'))
+                fig.add_bar(x=fss['Length'], y=fg['SMBpct'],marker_color='red', name=lake_select)
+                fig.update_xaxes(range=[0, 22])
+                tab4.plotly_chart(fig, use_container_width=True)
+                col1,col2,col3,col4,col5=tab4.columns(5)
+                col2.metric('**Smallmouth Bass BFI**',BFI_SMB)
+                col4.metric('**Smallmouth Bass BFI Percentile**',BFI_SMB_PCT)
+            
         else:
             st.write("No Fishery Survey Data for Walleye, Northern Pike, Smallmouth, or Lake Trout")
         st.write('**Survey Date:**    '+SurveyDate)
