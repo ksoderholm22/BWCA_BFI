@@ -104,8 +104,6 @@ if selected=="About":
         st.write('**(2)**     Interactive map auto centered to lake selection, topographic and satellite layers, markers/colors for campsites and portages, hover data shows campsite number and portage distance)')
         st.write('**(3)**     Fishery Lake Survey data shown which includes: Lake Characteristics, Fish Size Distribution, and Status of the Fishery')
         st.write('**(4)**     Top three search results from YouTube for the prompt "<selected lake> BWCA"')
-    with st.expander('Lake Stats'):
-        st.write('**(1)**     Not sure yet')
     with st.expander('Big Fish Index'):
         st.write('**(1)**     Optional filter on County within BWCA')
         st.write('**(2)**     List of lakes within county selection, sorted by BFI (high to low), with tab options for different species, and a download to CSV button')
