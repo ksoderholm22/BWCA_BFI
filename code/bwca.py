@@ -25,8 +25,8 @@ def load_lottiefile(filepath: str):
  
 #Create Menu
 with st.sidebar:
-    selected = option_menu("BWCA Lake Search", ["About", 'Lake Search','Big Fish Index','Gallery'], 
-        icons=['info-circle','search','calculator','camera'],menu_icon="water", default_index=0)
+    selected = option_menu("BWCA Lake Search", ["Welcome","About", 'Lake Search','Big Fish Index','Gallery'], 
+        icons=['play-btn','info-circle','search','calculator','camera'],menu_icon="water", default_index=0)
     lottie = load_lottiefile("vidimage/fish2.json")
     st_lottie(lottie)
   
@@ -86,6 +86,10 @@ def merge():
     return lm_reduce, camps_ports
 lm_reduce,camps_ports=merge()
 
+if selected=="Welcome":
+    video_file = open('vidimage/BWCA_Lake_Search_Compress.mp4', 'rb')
+    video_bytes = video_file.read()
+    st.video(video_bytes)
 if selected=="About":
     st.header('About the BWCA')
     st.write('Established in 1964 as Federally Designated Wilderness, the Boundary Waters Canoe Area Wilderness is over one million acres of rugged and remote boreal forest in the northern third of the Superior National Forest in northeastern Minnesota.')
