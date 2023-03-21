@@ -26,7 +26,7 @@ def load_lottiefile(filepath: str):
 #Create Menu
 with st.sidebar:
     selected = option_menu("BWCA Lake Search", ["About", 'Lake Search','Big Fish Index','Gallery'], 
-        icons=['info-circle','search','calculator','camera'],menu_icon="tree-fill", default_index=0)
+        icons=['info-circle','search','calculator','camera'],menu_icon="water", default_index=0)
     lottie = load_lottiefile("vidimage/fish2.json")
     st_lottie(lottie)
   
@@ -111,9 +111,7 @@ if selected=="About":
         st.write('**(1)**     Enter a Lake Name')
         st.write('**(2)**     Interactive map auto centered to lake selection, topographic and satellite layers, markers/colors for campsites and portages, hover data shows campsite number and portage distance)')
         st.write('**(3)**     Fishery Lake Survey data shown which includes: Lake Characteristics, Fish Size Distribution, and Status of the Fishery')
-        st.write('**(4)**     Top three search results from YouTube for the prompt "<selected lake> BWCA"')
-    with st.expander('Lake Stats'):
-        st.write('**(1)**     Not sure yet')
+        st.write('**(4)**     Top three BWCA search results from YouTube for your selected lake"')
     with st.expander('Big Fish Index'):
         st.write('**(1)**     Optional filter on County within BWCA')
         st.write('**(2)**     List of lakes within county selection, sorted by BFI (high to low), with tab options for different species, and a download to CSV button')
@@ -307,7 +305,7 @@ if selected=="Lake Search":
             BFI_WAE_PCT_RAW=lakeaggshort.loc[0]['BFI_WAE_Pct_Raw']
     
 
-            tab1,tab2,tab3,tab4,tab5=st.tabs(['Radar','Walleye','Northern Pike','Lake Trout','Smallmouth Bass'])
+            tab1,tab2,tab3,tab4,tab5=st.tabs(['The Big Four','Walleye','Northern Pike','Lake Trout','Smallmouth Bass'])
             with tab1:
                 def cat(col,BFI_PCT):
                     if BFI_PCT<=0.2:
