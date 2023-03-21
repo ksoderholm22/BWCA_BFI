@@ -400,15 +400,14 @@ if selected=="Lake Search":
 if selected=="Big Fish Index":
     @st.cache_data
     def convert_df(df):
-    # IMPORTANT: Cache the conversion to prevent computation on every rerun
         return df.to_csv().encode('utf-8')
 
     st.header('Big Fish Index (BFI)')
+    
     with st.expander('What is it?'):
         st.write('BFI is a lake and species level ranking metric that compares the fish size distribution of a selected lake, to the fish size distribution of all BWCA lakes with Fish Survey Data.')
     with st.expander('How is it calculated?'):
         st.write('BFI is calculated as a ratio of the average length of a fish species between a sample (selected lake) and population (all BWCA lakes). This ratio is then scaled into an index from 1-100 based on the minimum and maximum values from all BWCA lakes.  Higher values indicate a larger fish size distribution.')
-    
     #county filter.  
     st.header('Filter by County')
     county_select=st.selectbox('Select County',['All']+list(lm_reduce['County'].unique()))
@@ -429,37 +428,30 @@ if selected=="Big Fish Index":
     # Inject CSS with Markdown
     st.markdown(hide_table_row_index, unsafe_allow_html=True)
     #show ranking by species within filtered universe
-    st.header('BFI Rankings')
-    tab1,tab2,tab3,tab4=st.tabs(['Walleye','Northern Pike','Lake Trout','Smallmouth Bass'])
+    st.header('Big Fish Index')
+    tab1,tab2=st.tabs(['Plots','Data'])
     with tab1:
-        t1cols=['lake','ID','Nearest Town','County','BFI_WAE','BFI_WAE_Pct']
-        t1=merged_reduced.sort_values(by=['BFI_WAE'],ascending=False)
-        tab1.table(t1[t1cols].head(20))
-        csv = convert_df(t1)
-        st.download_button(label="Download data as CSV",data=csv,file_name='WAE_BFI.csv',mime='text/csv',)
+        fishselect=tab1.multiselect('Which Species to Analyze? (Hint: Try selecting multiple)',['BFI_WAE','BFI_NOP','BFI_SMB'])
+        if len(fishselect)==1:
+            t1=merged_reduced.sort_values(by=fishselect,ascending=False)
+            t1=t1.loc[t1[fishselect[0]].notnull()]
+            fig=px.bar(data_frame=t1,x='LakeID',y=fishselect[0],hover_data=['lake'])
+            fig.update_xaxes(type='category')
+            tab1.plotly_chart(fig,use_container_width=True)
+        if len(fishselect)==2:
+            fig=px.scatter(data_frame=merged_reduced,x=fishselect[0],y=fishselect[1],labels=dict(x=fishselect[0], y=fishselect[1]),hover_data=['lake','LakeID'])
+            tab1.plotly_chart(fig,use_container_widt=True)
+        if len(fishselect)==3:
+            fig = px.scatter_3d(merged_reduced, x='BFI_NOP', y='BFI_WAE', z='BFI_SMB',color='County',hover_name="lake",width=1200,height=1000)
+            tab1.plotly_chart(fig,use_container_widt=True)
+
     with tab2:
-        t2cols=['lake','ID','Nearest Town','County','BFI_NOP','BFI_NOP_Pct']
-        t2=merged_reduced.sort_values(by=['BFI_NOP'],ascending=False)
+        sortselect=tab2.selectbox('Sort by',['BFI_WAE','BFI_SMB','BFI_NOP'])
+        t2cols=['lake','ID','Nearest Town','County','BFI_WAE','BFI_WAE_Pct','BFI_SMB','BFI_SMB_Pct','BFI_NOP','BFI_NOP_Pct']
+        t2=merged_reduced.sort_values(by=[sortselect],ascending=False)
         tab2.table(t2[t2cols].head(20))
         csv = convert_df(t2)
         st.download_button(label="Download data as CSV",data=csv,file_name='NOP_BFI.csv',mime='text/csv',)
-    with tab3:
-        t3cols=['lake','ID','Nearest Town','County','BFI_LAT','BFI_LAT_Pct']
-        t3=merged_reduced.sort_values(by=['BFI_LAT'],ascending=False)
-        tab3.table(t3[t3cols].head(20))
-        csv = convert_df(t3)
-        st.download_button(label="Download data as CSV",data=csv,file_name='LAT_BFI.csv',mime='text/csv',)
-    with tab4:
-        t4cols=['lake','ID','Nearest Town','County','BFI_SMB','BFI_SMB_Pct']
-        t4=merged_reduced.sort_values(by=['BFI_SMB'],ascending=False)
-        tab4.table(t4[t4cols].head(20))
-        csv = convert_df(t4[t4cols].head(50))
-        st.download_button(label="Download data as CSV",data=csv,file_name='SMB_BFI.csv',mime='text/csv',)
-        
-    #3d plot
-    st.header('3-D Plot')
-    fig = px.scatter_3d(merged_reduced, x='BFI_NOP', y='BFI_WAE', z='BFI_SMB',color='County',hover_name="lake",width=1200,height=1000)
-    st.plotly_chart(fig)
 
 if selected=="Gallery":
     tab1,tab2,tab3,tab4=st.tabs(['Smallmouth','Walleye','Northern Pike','Lake Trout'])
