@@ -8,6 +8,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from streamlit_option_menu import option_menu
 import markdownify
+from streamlit_lottie import st_lottie
 
 #Layout
 st.set_page_config(
@@ -17,10 +18,17 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+@st.cache_data
+def load_lottiefile(filepath: str):
+    with open(filepath,"r") as f:
+        return json.load(f)
+ 
 #Create Menu
 with st.sidebar:
     selected = option_menu("BWCA Lake Search", ["About", 'Lake Search','Big Fish Index','Gallery'], 
         icons=['info-circle','search','calculator','camera'],menu_icon="tree-fill", default_index=0)
+    lottie = load_lottiefile("vidimage/fish2.json")
+    st_lottie(lottie)
   
 #read data
 @st.cache_data
