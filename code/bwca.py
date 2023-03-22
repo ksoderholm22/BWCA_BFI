@@ -412,7 +412,7 @@ if selected=="Big Fish Index":
         st.write('BFI is a lake and species level ranking metric that compares the fish size distribution of a selected lake, to the fish size distribution of all BWCA lakes with Fish Survey Data.')
     with st.expander('How is it calculated?'):
         st.write('BFI is calculated as a ratio of the average length of a fish species between a sample (selected lake) and population (all BWCA lakes). This ratio is then scaled into an index from 1-100 based on the minimum and maximum values from all BWCA lakes.  Higher values indicate a larger fish size distribution.')
-     with st.expander('Definitions'):
+    with st.expander('Definitions'):
         st.write('WAE = Walleye')
         st.write('NOP = Northern Pike')
         st.write('SMB = Smallmouth Bass')
