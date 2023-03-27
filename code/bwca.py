@@ -390,17 +390,22 @@ if selected=="Lake Search":
         youtube = build('youtube','v3',developerKey = api_key)
         search=lake_select+' lake BWCA'
         request = youtube.search().list(q=search,part='snippet',type='video')
-        res = request.execute()
-        list=[]
-        for item in res['items']:
-            list.append(item['id']['videoId'])
-        #search
-        yt_url1='https://www.youtube.com/watch?v='+list[0]
-        yt_url2='https://www.youtube.com/watch?v='+list[1]
-        yt_url3='https://www.youtube.com/watch?v='+list[2]
-        st.video(yt_url1)
-        st.video(yt_url2)
-        st.video(yt_url3)
+        try:
+            res = request.execute()
+            list=[]
+            for item in res['items']:
+                list.append(item['id']['videoId'])
+            #search
+            yt_url1='https://www.youtube.com/watch?v='+list[0]
+            yt_url2='https://www.youtube.com/watch?v='+list[1]
+            yt_url3='https://www.youtube.com/watch?v='+list[2]
+            yt_url1
+            st.video(yt_url1)
+            st.video(yt_url2)
+            st.video(yt_url3)
+        except:
+            st.error('Sorry, the daily quota for YouTube Data API has already been met (lots of visitors!), try this section again tomorrow')
+        
 if selected=="Big Fish Index":
     @st.cache_data
     def convert_df(df):
