@@ -404,7 +404,7 @@ if selected=="Lake Search":
             st.video(yt_url2)
             st.video(yt_url3)
         except:
-            st.error('Sorry, the daily quota for YouTube Data API has already been met (lots of visitors!), try this section again tomorrow')
+            st.warning('Sorry, the daily quota for YouTube Data API has already been met (lots of visitors!), try this section again tomorrow')
         
 if selected=="Big Fish Index":
     @st.cache_data
